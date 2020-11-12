@@ -11,7 +11,7 @@ const PADDLE_HEIGHT=20;
 const BRICKS_WIDTH=60;
 const BRICKS_HEIGHT=30;
 const BALL_RADIUS=8;
-const ball_max_speed=12;
+const BALL_MAX_SPEED=12;
 var paddleimg =document.getElementById("img");
 var gameStarted=false;
 //keyboard
@@ -132,20 +132,32 @@ function update(){
     ball.lastX=ball.x;
     ball.lastY=ball.y;
     
-    if(ball.y+BALL_RADIUS>paddle.y&&ball.y+BALL_RADIUS<paddle.y+PADDLE_HEIGHT){/////if the ball hits the paddle/////////
-        if(ball.x-BALL_RADIUS>paddle.x && ball.x+BALL_RADIUS<paddle.x+PADDLE_WIDTH){
-       ball.up=true;
-       console.log(deltaY);
-       console.log(ball.ySpeed,ball.xSpeed);
-       if(ball.xSpeed<=ball_max_speed && ball.ySpeed<=ball_max_speed){
+    if(ball.y+BALL_RADIUS>paddle.y&&ball.y+BALL_RADIUS<paddle.y+PADDLE_HEIGHT){
+        if(ball.x+BALL_RADIUS>paddle.x&&ball.x-BALL_RADIUS<paddle.x+PADDLE_WIDTH){
+            let midPoint = paddle.x+PADDLE_WIDTH/2;
+            let startPoint = paddle.x;
+            let endPoint = paddle.x+PADDLE_WIDTH;
            
-           var deltaY=Math.abs(ball.x-(paddle.x+PADDLE_WIDTH/2)) ;//absolute value from math abs method
-
-           ball.ySpeed+=deltaY*.03;
-           ball.xSpeed+=deltaY*.03;  
-           console.log(ball.ySpeed,ball.xSpeed);
-       }
-     }
+                    if(ball.x<midPoint){
+                        ball.up=true;
+                        ball.right=false;
+                        
+                       console.log(ball.xSpeed)
+                        ball.xSpeed =BALL_MAX_SPEED - ((ball.x - startPoint)/(midPoint-startPoint)) * BALL_MAX_SPEED;
+                       
+                    }
+                    if(ball.x>midPoint){
+                        ball.up=true;
+                        ball.right=true;
+                        
+                       console.log(ball.xSpeed)
+                        ball.xSpeed = BALL_MAX_SPEED - ((endPoint - ball.x)/(endPoint-midPoint)) * BALL_MAX_SPEED;
+  
+                    }
+                    
+            console.log('paddleHIT');
+        }
+       
     }
 
     for(var i=0;i<bricks.length;i++){
@@ -154,7 +166,11 @@ function update(){
             console.log("hit");
             bricks.splice(i,1);
             i--;//because the deleted position will have a new element with same value of i
-            ball.up=false;
+            if(ball.up)
+            {ball.up=false;}
+            else{
+                ball.up=true;
+            }
     }
 
 }
@@ -173,7 +189,17 @@ function checkCollision(ballElement,brickElement){
 function createBrickGrid(){
     for(var i=0;i<14;i++){
         for(var j=0;j<6;j++){
-            createBrick(i*(BRICKS_WIDTH+10)+40,j*(BRICKS_HEIGHT+5)+20);
+            if(i==j){
+                createBrick(i*(BRICKS_WIDTH+10)+40,j*(BRICKS_HEIGHT+5)+20);
+            }
+            if(i==j+1){
+                createBrick(i*(BRICKS_WIDTH+10)+40,j*(BRICKS_HEIGHT+5)+20);
+            }
+            if(i>6){
+                if(j<3)
+               { createBrick(i*(BRICKS_WIDTH+10)+40,j*(BRICKS_HEIGHT+5)+20);}
+            }
+            
         }
     
     }
